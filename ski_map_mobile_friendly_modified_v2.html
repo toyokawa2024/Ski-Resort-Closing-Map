@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>スキー場マップ</title>
+  <style>
+    
+    html, body { margin: 0; padding: 0; height: 100%; }
+    #map { height: 100%; width: 100%; }
+    @media (max-width: 600px) {
+      .info.legend {
+        font-size: 20px;
+        padding: 18px;
+        line-height: 2;
+      }
+    }
+    
+    .info.legend {
+      background: white;
+      padding: 16px;
+      font-size: 18px;
+      border-radius: 4px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.3);
+      line-height: 1.5;
+    }
+    .info.legend i {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      margin-right: 6px;
+    }
+  </style>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+  <div id="map"></div>
+  <script>
+    const map = L.map('map').setView([38.0, 138.0], 5);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    const skiResorts = [{ name: "富良野スキー場", lat: 43.3322, lon: 142.3513, endDate: "5月6日（火）", url: "http://www.princehotels.co.jp/ski/furano/" },
+      { name: "キロロスノーワールド", lat: 43.0475, lon: 141.1144, endDate: "5月6日（火）", url: "https://www.kiroro.co.jp/ja/snowworld" },
+      { name: "札幌国際スキー場", lat: 43.0756, lon: 141.0599, endDate: "5月6日（火）", url: "https://www.sapporo-kokusai.jp/" },
+      { name: "サッポロテイネ", lat: 43.1162, lon: 141.2048, endDate: "5月6日（火）", url: "http://www.sapporo-teine.com/snow/" },
+      { name: "ニセコアンヌプリ国際スキー場", lat: 42.8623, lon: 140.6612, endDate: "5月6日（火）", url: "http://annupuri.info/winter/" },
+      { name: "ニセコ グラン・ヒラフ", lat: 42.8562, lon: 140.7034, endDate: "5月6日（火）", url: "http://www.grand-hirafu.jp/winter/" },
+      { name: "大雪山 黒岳スキー場", lat: 43.7211, lon: 142.9466, endDate: "5月6日（火）", url: "http://www.rinyu.co.jp/modules/pico01/" },
+      { name: "中山峠スキー場", lat: 42.9141, lon: 140.6182, endDate: "5月6日（火）", url: "http://nakayama-ski.com/" },
+      { name: "八甲田国際スキー場", lat: 40.6571, lon: 140.8502, endDate: "5月6日（火）", url: "http://www.hakkouda-p.com/cn21/pg110.html" },
+      { name: "秋田八幡平スキー場", lat: 39.9268, lon: 140.8724, endDate: "5月6日（火）", url: "http://www.akihachi.jp/" },
+      { name: "夏油高原スキー場", lat: 39.2601, lon: 141.1012, endDate: "5月6日（火）", url: "https://www.getokogen.com/winter" },
+      { name: "蔵王温泉スキー場", lat: 38.1639, lon: 140.3963, endDate: "5月6日（火）", url: "http://www.zao-ski.or.jp/" },
+      { name: "天元台高原", lat: 37.7335, lon: 140.0579, endDate: "5月6日（火）", url: "http://www.tengendai.jp/" },
+      { name: "月山スキー場", lat: 38.5277, lon: 140.0492, endDate: "6月8日（日）", url: "https://gassankk.co.jp/" },
+      { name: "星野リゾート ネコマ マウンテン", lat: 37.6239, lon: 140.2544, endDate: "5月6日（火）", url: "https://www.nekoma.co.jp/" },
+      { name: "たんばらスキーパーク", lat: 36.7706, lon: 139.1787, endDate: "5月6日（火）", url: "https://www.tambara.co.jp/winter" },
+      { name: "丸沼高原スキー場", lat: 36.7896, lon: 139.3158, endDate: "5月6日（火）", url: "http://www.marunuma.jp/" },
+      { name: "ロッテアライリゾート", lat: 37.0176, lon: 138.1586, endDate: "5月11日（日）", url: "https://www.lottehotel.com/arai-resort/" },
+      { name: "かぐらスキー場", lat: 36.8505, lon: 138.7771, endDate: "5月18日（日）", url: "https://www.princehotels.co.jp/ski/kagura/winter/" },
+      { name: "奥只見丸山スキー場", lat: 37.1175, lon: 139.2875, endDate: "5月6日（火）", url: "http://www.okutadami.co.jp/ski/" },
+      { name: "シャルマン火打スキー場", lat: 37.0031, lon: 137.8946, endDate: "5月5日（月）", url: "http://charmant-hiuchi.jp/" },
+      { name: "関温泉スキー場", lat: 37.0275, lon: 138.1892, endDate: "5月6日（火）", url: "http://www.sekionsen.com/" },
+      { name: "ガーラ湯沢スキー場", lat: 36.9358, lon: 138.8192, endDate: "5月6日（火）", url: "https://gala.co.jp/winter" },
+      { name: "赤倉観光リゾートスキー場", lat: 36.8911, lon: 138.1739, endDate: "5月6日（火）", url: "http://www.akr-ski.com/" },
+      { name: "野沢温泉スキー場", lat: 36.9188, lon: 138.4415, endDate: "5月6日（火）", url: "http://www.nozawaski.com/" },
+      { name: "志賀高原リゾートエリア", lat: 36.7286, lon: 138.4586, endDate: "5月6日（火）", url: "http://www.shigakogen.co.jp/" },
+      { name: "奥志賀高原スキー場", lat: 36.7488, lon: 138.5338, endDate: "5月6日（火）", url: "http://www.okushiga.jp/skiresort/" },
+      { name: "横手山・渋峠スキー場", lat: 36.6736, lon: 138.5289, endDate: "5月中旬", url: "https://yokoteyama2307.com/" },
+      { name: "Hakuba47ウインタースポーツパーク", lat: 36.6956, lon: 137.8217, endDate: "5月6日（火）", url: "http://www.hakuba47.co.jp/" },
+      { name: "栂池高原スキー場", lat: 36.7764, lon: 137.8508, endDate: "5月6日（火）", url: "http://www.tsugaike.gr.jp/" },
+      { name: "白馬五竜スキー場", lat: 36.6826, lon: 137.8372, endDate: "5月6日（火）", url: "https://goryu47.com/" },
+      { name: "高鷲スノーパーク", lat: 35.9579, lon: 136.8715, endDate: "5月6日（火）", url: "https://www.takasu.gr.jp/" }];
+
+    function getColorByEndDate(date) {
+      if (date.includes("6月")) return "purple";
+      if (date.includes("5月18日")) return "red";
+      if (date.includes("5月11日")) return "orange";
+      if (date.includes("5月中旬")) return "blue";
+      return "green";
+    }
+
+    skiResorts.forEach(resort => {
+      const color = getColorByEndDate(resort.endDate);
+      const marker = L.circleMarker([resort.lat, resort.lon], {
+        radius: 8,
+        fillColor: color,
+        color: "#333",
+        weight: 1,
+        opacity: 1,
+        fillOpacity: 0.9
+      }).addTo(map);
+      marker.bindTooltip(
+      `<a href="${resort.url}" target="_blank" style="text-decoration: none; color: black;">${resort.name}</a>`, 
+      { permanent: true, direction: "top", className: "custom-tooltip" }
+    );
+          });
+
+    const legend = L.control({ position: 'topright' });
+    legend.onAdd = function (map) {
+      const div = L.DomUtil.create('div', 'info legend');
+      const categories = [
+        { label: "6月8日", color: "purple" },
+        { label: "5月18日", color: "red" },
+        { label: "5月11日", color: "orange" },
+        { label: "5月中旬", color: "blue" },
+        { label: "5月6日", color: "green" }
+      ];
+      div.innerHTML = '<strong>営業終了日</strong><br>';
+      categories.forEach(cat => {
+        div.innerHTML += `<i style="background:${cat.color}"></i>${cat.label}<br>`;
+      });
+      return div;
+    };
+    legend.addTo(map);
+  </script>
+</body>
+</html>
